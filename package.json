@@ -9,5 +9,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^4.20.0",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
+  }
 }
