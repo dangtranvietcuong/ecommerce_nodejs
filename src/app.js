@@ -10,10 +10,11 @@ app.use(morgan("dev")) // using when running in local
 // app.use(morgan("common"))
 // app.use(morgan("short"))
 // app.use(morgan("tiny"))
-app.use(helmet())
-app.use(compression())
+app.use(helmet()) // ẩn thông tin và framework của project đang sử dụng
+app.use(compression()) // giảm dữ liệu băng thông truyền tải
 
 // init db
+require('./dbs/init.mongodb')
 
 // init routes
 app.get('/', (req, res, next) => {
