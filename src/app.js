@@ -16,17 +16,11 @@ app.use(compression()) // giảm dữ liệu băng thông truyền tải
 
 // init db
 require('./dbs/init.mongodb')
-const {checkOverload} = require('./helpers/check.connect')
-checkOverload();
+// const {checkOverload} = require('./helpers/check.connect')
+// checkOverload();
 
 // init routes
-app.get('/', (req, res, next) => {
-    const strCompress = 'Hello CuongDTV';
-    return res.status(200).json({
-        message: 'Welcome CuongDTV',
-        metadata: strCompress.repeat(100000)
-    })
-})
+app.use('', require('./routes'))
 
 // handle errors
 
