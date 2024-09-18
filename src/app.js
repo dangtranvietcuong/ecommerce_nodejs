@@ -13,6 +13,8 @@ app.use(morgan("dev")) // using when running in local
 // app.use(morgan("tiny"))
 app.use(helmet()) // ẩn thông tin và framework của project đang sử dụng
 app.use(compression()) // giảm dữ liệu băng thông truyền tải
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
 // init db
 require('./dbs/init.mongodb')
