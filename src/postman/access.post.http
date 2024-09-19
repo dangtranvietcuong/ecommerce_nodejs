@@ -3,9 +3,10 @@
 ### signup
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
+x-api-key: 4c64c0c7626394ce5bde99e866ecd82dce590d7c387541cb611cd0de7b44998881fc9586a2ab630f97731f9381a2d751bccb4734b23fb5f7b2b289812a6221b1
 
 {
     "name": "Shop CuongDTV",
-    "email": "cuongdtv01@gmail.com",
+    "email": "cuongdtv03@gmail.com",
     "password": "abc@123"
 }
