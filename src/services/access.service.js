@@ -21,6 +21,14 @@ const roleShop = {
 };
 
 class AccessService {
+
+  // LOGOUT
+  static logout = async(keyStore) => {
+    const delKey = await KeyTokenService.removeKeyById(keyStore._id);
+    console.log(delKey);
+    return delKey;
+  }
+
   // LOGIN
   /*
     1 - check email in dbs

@@ -40,7 +40,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     3 - verify token
     4 - check user in db
     5 - check keyStore with this userId
-    6 - return next
+    6 - Ok all => return next
   */
   const userId = req.headers[HEADER.CLIENT_ID];
   if (!userId) throw new AuthFailureError("Invalid Request");
@@ -50,7 +50,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (!keyStore) throw new NotFoundError("Not Found keyStore");
 
   // 3
-  const accessToken = req.headers[Headers.AUTHORIZATION];
+  const accessToken = req.headers[HEADER.AUTHORIZATION];
   if (!accessToken) throw new AuthFailureError("Invalid Request");
 
   // 4
@@ -67,4 +67,5 @@ const authentication = asyncHandler(async (req, res, next) => {
 
 module.exports = {
   createTokenPair,
+  authentication
 };
