@@ -3,11 +3,11 @@
 ### signup
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
-x-api-key: 94e0af8461900fdca4ef8c4b6ecabce3b9b8fa44d4a658d23269ba18216d2bd2f5b4b5a2d98e9e700438a2d6e83f6b1eab0d0aaf8947a173a550f4397903ec01
+x-api-key: 8fc04a651679cb2b7c685c5284790447adc0be0d3101f747566be320ce8ee16f2c4a6bcfca12b7d71e3af52db235e225b84b2971ea5a5127a376844784f9da48
 
 {
     "name": "Shop Test",
-    "email": "shoptest2@gmail.com",
+    "email": "shoptest@gmail.com",
     "password": "1234"
 }
 

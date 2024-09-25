@@ -4,12 +4,13 @@ const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/authUtils");
+const { createTokenPair, verifyJWT } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
 const {
   BadRequestError,
   ConflictRequestError,
   AuthFailureError,
+  ForbiddenError,
 } = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
 
@@ -21,13 +22,67 @@ const roleShop = {
 };
 
 class AccessService {
+  /**
+   *
+   * @param {*} refreshToken
+   * check this token used
+   */
+  static handlerRefreshToken = async (refreshToken) => {
+    // check xem token nay da su dung hay chua
+    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
+      refreshToken
+    );
+
+    if (foundToken) {
+      const { userId, email } = await verifyJWT(
+        refreshToken,
+        foundToken.privateKey
+      );
+      console.log({ userId, email });
+      // xoa tat ca cac token trong keyStore
+      await KeyTokenService.deleteById(userId);
+      throw new ForbiddenError("Something wrong happend! Please relogin");
+    }
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!holderToken) throw new AuthFailureError("Shop isn't registered!");
+    const { userId, email } = await verifyJWT(
+      refreshToken,
+      holderToken.privateKey
+    );
+    console.log({ userId, email });
+
+    const foundShop = await findByEmail({ email });
+
+    if (!foundShop) throw new AuthFailureError("Shop isn't registered!");
+    // tao moi 1 cap
+    const tokens = await createTokenPair(
+      { userId, email },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+
+    // update token
+    await holderToken.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken, //da duoc su dung de lay token moi roi
+      },
+    });
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
 
   // LOGOUT
-  static logout = async(keyStore) => {
+  static logout = async (keyStore) => {
     const delKey = await KeyTokenService.removeKeyById(keyStore._id);
     console.log(delKey);
     return delKey;
-  }
+  };
 
   // LOGIN
   /*
@@ -37,38 +92,41 @@ class AccessService {
     4 - generate tokens
     5 - get data return login
   */
-  static login = async({email, password, refreshToken = null}) => {
+  static login = async ({ email, password, refreshToken = null }) => {
     // 1
-    const foundShop = await findByEmail({email})
-    console.log('FOUNDSHOP:::',foundShop);
-    
-    if(!foundShop) throw new BadRequestError('Shop not registered')
+    const foundShop = await findByEmail({ email });
+    console.log("FOUNDSHOP:::", foundShop);
+
+    if (!foundShop) throw new BadRequestError("Shop not registered");
     // 2
-    const match = bcrypt.compare(password, foundShop.password)
-    if(!match) throw new AuthFailureError('Authentication error')
+    const match = bcrypt.compare(password, foundShop.password);
+    if (!match) throw new AuthFailureError("Authentication error");
     // 3
     const privateKey = crypto.randomBytes(64).toString("hex");
     const publicKey = crypto.randomBytes(64).toString("hex");
     // 4
-    const {_id: userId} = foundShop;
+    const { _id: userId } = foundShop;
 
     const tokens = await createTokenPair(
       { userId, email },
       publicKey,
       privateKey
     );
-    
+
     await KeyTokenService.createKeyToken({
       userId,
       refreshToken: tokens.refreshToken,
-      privateKey, 
+      privateKey,
       publicKey,
-    })
+    });
     return {
-      shop: getInfoData({fields: ['_id', 'name', 'email'], object: foundShop}),
-      tokens
-    }
-  }
+      shop: getInfoData({
+        fields: ["_id", "name", "email"],
+        object: foundShop,
+      }),
+      tokens,
+    };
+  };
 
   // REGISTER
   static signUp = async ({ name, email, password }) => {

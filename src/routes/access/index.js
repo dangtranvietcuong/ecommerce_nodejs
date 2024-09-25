@@ -8,14 +8,15 @@ const router = express.Router();
 
 // signUp
 router.post("/shop/signup", asyncHandler(accessController.signUp));
+// login
+router.post("/shop/login", asyncHandler(accessController.login));
 
 // authentication
 router.use(authentication)
 
-// login
-router.post("/shop/login", asyncHandler(accessController.login));
-
 // logout
 router.post("/shop/logout", asyncHandler(accessController.logout));
+// refresh token
+router.post("/shop/handlerRefreshToken", asyncHandler(accessController.handlerRefreshToken))
 
 module.exports = router;
