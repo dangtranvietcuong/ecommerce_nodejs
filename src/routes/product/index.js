@@ -10,6 +10,6 @@ const router = express.Router();
 router.use(authenticationV2)
 
 // logout
-// router.post("", asyncHandler(productController.createProduct()));
+router.post("", asyncHandler(productController.createProduct));
 
 module.exports = router;
